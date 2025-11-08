@@ -6,8 +6,8 @@ import uuid
 def connect_db():
     return mysql.connector.connect(
         host='localhost',
-        user='root',
-        password='Root@123'
+        user='pius',
+        password='Pius@123'
     )
 
 # create the database if it does not exist
@@ -20,8 +20,8 @@ def create_database(connection):
 def connect_to_prodev():
     return mysql.connector.connect(
         host='localhost',
-        user='root',
-        password='Root@123',
+        user='pius',
+        password='Pius@123',
         database='ALX_prodev'
     )
 

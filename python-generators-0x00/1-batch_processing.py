@@ -6,13 +6,13 @@ def stream_users_in_batches(batch_size):
     """Generator to fetch rows from users table in batches."""
     conn = mysql.connector.connect(
         host="localhost",
-        user="root",
-        password="Root@123",  
-        database="Alx_prodev"          
+        user="pius",
+        password="Pius@123",  
+        database="ALX_prodev"          
     )
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM users")
+    cursor.execute("SELECT * FROM user_data")
     
     batch = []
     # Loop through each row, collecting them into batches
