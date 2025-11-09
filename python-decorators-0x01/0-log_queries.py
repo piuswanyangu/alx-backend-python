@@ -1,33 +1,52 @@
-import sqlite3
 import functools
+import logging
+import sqlite3
+from datetime import datetime
+from typing import Any, Callable, Optional
 
-#  Decorator to log SQL queries
-def log_queries(func):
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
+LOGGER = logging.getLogger("alx.decorators.log_queries")
+
+
+def log_queries(func: Callable[..., Any]) -> Callable[..., Any]:
+    """Log the SQL query passed to the decorated function before execution."""
+
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        # Extract the query argument
-        query = kwargs.get('query') if 'query' in kwargs else args[0] if args else None
-        if query:
-            print(f"[LOG] Executing SQL Query: {query}")
-        else:
-            print("[LOG] No SQL query provided.")
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        query: Optional[str] = kwargs.get("query")
+        if query is None and args:
+            query = args[0]
 
-        # Execute the original function
-        result = func(*args, **kwargs)
-        print("[LOG] Query execution completed.\n")
-        return result
+        timestamp = datetime.utcnow().isoformat()
+        if query:
+            LOGGER.info("[%s] Executing SQL query: %s", timestamp, query)
+        else:
+            LOGGER.warning(
+                "[%s] No SQL query argument supplied to %s",
+                timestamp,
+                func.__name__,
+            )
+
+        return func(*args, **kwargs)
+
     return wrapper
 
 
 @log_queries
-def fetch_all_users(query):
-    conn = sqlite3.connect('users.db')
+def fetch_all_users(query: str) -> list[tuple[Any, ...]]:
+    conn = sqlite3.connect("users.db")
     cursor = conn.cursor()
-    cursor.execute(query)
-    results = cursor.fetchall()
-    conn.close()
-    return results
+    try:
+        cursor.execute(query)
+        return cursor.fetchall()
+    finally:
+        cursor.close()
+        conn.close()
 
 
-#  Example usage
-users = fetch_all_users(query="SELECT * FROM users")
+if __name__ == "__main__":
+    users = fetch_all_users(query="SELECT * FROM users")
+    print(users)
