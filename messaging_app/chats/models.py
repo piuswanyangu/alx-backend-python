@@ -2,7 +2,7 @@ from django.db import models
 import uuid
 from django.contrib.auth.models import AbstractUser
 
-# Create your models here.
+# Creating models 
 # user model
 class User(AbstractUser):
     # Replace integer PK with UUID
