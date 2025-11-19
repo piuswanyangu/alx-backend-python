@@ -3,7 +3,7 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
-
+# user model
 class User(AbstractUser):
     # Replace integer PK with UUID
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4,editable=False)
@@ -28,7 +28,7 @@ class User(AbstractUser):
         return f"{self.first_name} {self.last_name} ({self.email})"
 
 
-
+# conversation model
 class Conversation(models.Model):
     Conversation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     participants = models.ManyToManyField(User, related_name="Conversations")
