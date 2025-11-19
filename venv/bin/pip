@@ -1,4 +1,4 @@
-#!/home/pius/Desktop/ALX_PDBE/alx-backend-python/venv/bin/python3
+#!/home/pius/Desktop/ALX_PDBE/alx-backend-python/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
