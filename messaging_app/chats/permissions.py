@@ -13,19 +13,23 @@ class IsOwnerOfObject(permissions.BasePermission):
         # view, send, update and delete message within it
         def has_permission(self, request, view):
             # allow only authenticated users to acces api
-            if request.user and request.user.is_authenticated:
-                return True
-            return False
+            return request.user and request.user.is_authenticated
+            
+        
         
         def has_object_permission(self, request, view, obj):
             # allow only participants of conversation to access object
             if hasattr(obj,'participants'):
-                # the obj is the convesation instances
-                return request.user in obj.participants.all()
+                # determines the conversation
+                conversation = obj
             # When accessing a Message object (e.g., PUT /messages/1/):
             # We need to access the related conversation through the message object.
             elif hasattr(obj,'conversation'):
-                return request.user in obj.conversation.participants.all()
+                conversation = obj.conversation
             
             # deny access if object structure is unexpected
-            return False
+            else:
+                return False
+            
+            is_participant = request.user in conversation.participants.all()
+            return is_participant
