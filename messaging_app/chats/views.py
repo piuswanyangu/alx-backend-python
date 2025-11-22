@@ -3,6 +3,7 @@ from .models import User, Conversation, Message
 from .serializers import UserSerializer, ConversationSerializer, MessageSerializer
 # import custom permissions 
 from .permissions import IsOwnerOfObject
+from .permissions import IsParticipantOfConversation
 
 class UserListView(generics.ListCreateAPIView):
     queryset = User.objects.all()
