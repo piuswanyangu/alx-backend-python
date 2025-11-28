@@ -1,5 +1,7 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
+
+from messaging_app.chats.models import User
 from .models import Message, Notification, MessageHistory
 
 # the @receiver decorator connects the function below to the post_save signals
@@ -54,3 +56,15 @@ def log_message_edit(sender, instance, **kwargs):
             instance.edited = True
             #  The new content (instance.content) is saved by the default Message.save() 
             # after this signal handler finishes.
+
+# the receiver decorator connect the function to the post_delete signal
+@receiver(post_delete, sender=User)
+def cleanup_user_related_data(sender,instance, **kwargs):
+    # clean up messagehistory where the user was the one who edited the message
+    print(f"User {instance.username} deleted.CASCADE handling other data")
+
+    # manually delete messages where user was the sender or receiver
+    Message.objects.filter(sender=instance).delete()
+    Message.objects.filter(receiver=instance).delete()
+
+    pass

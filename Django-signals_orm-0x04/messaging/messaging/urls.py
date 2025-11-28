@@ -20,5 +20,6 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('/message/history/', views.message_history)
+    path('/message/history/', views.message_history),
+    path('account/delete/', views.delete_user_account_view, name='delete_account')
 ]

@@ -1,23 +1,23 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Message # pyright: ignore[reportMissingImports]
+from django.shortcuts import redirect, render
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
+from django.contrib import messages
 
-def message_history_view(request, pk):
+@login_required
+def delete_user_account_view(request):
     """
-    Displays the current message and all its previous versions.
+    allows the current logged in user to delete their own account
     """
-    # 1. Fetch the primary message object, or return a 404 if it doesn't exist
-    message = get_object_or_404(Message, pk=pk)
-    
-    # 2. Fetch the history records related to this message.
-    # The 'history' is the related_name we defined in the MessageHistory model.
-    # We order by edited_at descending to show the most recent changes first.
-    history_records = message.history.all()
-    
-    # 3. Create the context dictionary to pass data to the template
-    context = {
-        'message': message,
-        'history_records': history_records,
-    }
-    
-    # 4. Render the template
-    return render(request, 'messaging/message_history.html', context)
+    if request.method == 'POST':
+        user = request.user
+
+        # log the user out immediately to prevent session issues
+        logout(request)
+
+        # this call trigers the post_delete signal before the record is removed from db
+        user.delete()
+
+        messages.success(request, "Your account and all related data have been successfully deleted")
+        return redirect('home') 
+    # for get request render a confirmation page
+    return render(request, 'messaging/confirm_delete.html')
