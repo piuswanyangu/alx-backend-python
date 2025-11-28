@@ -22,5 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('/message/<int:pk>/history/', views.message_history),
     path('account/delete/', views.delete_user_account_view, name='delete_account'),
-    path('message/<int:pk>/history/', views.message_history_view, name='message_history')
+    path('message/<int:pk>/history/', views.message_history_view, name='message_history'),
+    path('sent/', views.sent_message_view, name='sent_messages'),
+    
 ]

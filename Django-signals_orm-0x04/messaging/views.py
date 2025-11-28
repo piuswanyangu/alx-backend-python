@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
+from .models import Message
 
 from messaging_app.chats.models import Message
 
@@ -36,6 +37,7 @@ def message_history_view(request, pk):
     return render(request, 'messaging/message_history.html', context)
 
 def conversation_view(request):
+    
     # fetch all root messages
     root_messages = Message.objects.filter(parent_message__isnull=True).order_by('timestamp').select_related(
         'sender',
@@ -51,3 +53,14 @@ def conversation_view(request):
     }
 
     return render(request, 'messaging/conversation.html',context)
+
+def sent_messages_view(request):
+    """ 
+    Retrieves all messages sent by the current authenticated user
+
+    """
+    sent_messages = Message.objects.filter(sender=request.user).order_by('-timestamp').select_related('receiver')
+    context = {
+        'sent_messages': sent_messages
+    }
+    return render(request, 'messaging/sent_messages.html', context)
