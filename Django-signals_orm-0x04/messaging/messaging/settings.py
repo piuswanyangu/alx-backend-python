@@ -30,6 +30,17 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# CACHE CONFIGURATION
+# =========================================================================
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        # Use a unique identifier for this cache instance
+        'LOCATION': 'unique-snowflake', 
+    }
+}
+
 # Application definition
 
 INSTALLED_APPS = [

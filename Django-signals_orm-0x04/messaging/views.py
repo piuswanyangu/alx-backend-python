@@ -3,10 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from .models import Message
+from django.views.decorators.cache import cache_page
 
 from messaging_app.chats.models import Message
 
 @login_required
+
 def delete_user_account_view(request):
     """
     allows the current logged in user to delete their own account
@@ -25,7 +27,8 @@ def delete_user_account_view(request):
     # for get request render a confirmation page
     return render(request, 'messaging/confirm_delete.html')
 
-# view for displaying history
+# view for displaying 
+@login_required
 def message_history_view(request, pk):
     from .models import Message # type: ignore
     message = get_object_or_404(Message,pk=pk)
@@ -35,7 +38,7 @@ def message_history_view(request, pk):
         'history_records': history_records,
     }
     return render(request, 'messaging/message_history.html', context)
-
+@cache_page(60)
 def conversation_view(request):
     
     # fetch all root messages
@@ -53,7 +56,7 @@ def conversation_view(request):
     }
 
     return render(request, 'messaging/conversation.html',context)
-
+@login_required
 def sent_messages_view(request):
     """ 
     Retrieves all messages sent by the current authenticated user
@@ -64,7 +67,7 @@ def sent_messages_view(request):
         'sent_messages': sent_messages
     }
     return render(request, 'messaging/sent_messages.html', context)
-
+@login_required
 def inbox_view(request):
     # use the custom manager 'unread' and its custom methods
     unread_messages_qs = Message.unread.unread_for_user(request.user)
