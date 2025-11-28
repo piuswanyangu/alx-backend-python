@@ -45,7 +45,7 @@ class Message(models.Model):
 class Notification(models.Model):
     # the user who is receiving the information
     user = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
-    # the message that triggerred this notification
+    # the message that triggered this notification
     message = models.ForeignKey(Message, related_name='notifications', on_delete=models.CASCADE)
     # text to display for the notifications
     text = models.CharField(max_length=255)
@@ -61,7 +61,7 @@ class Notification(models.Model):
         return f"Notification for {self.user.username}: {self.text}"
     
 
-# this model stores the old content everytime a message is updated
+# this model stores the old content every time a message is updated
 class MessageHistory(models.Model):
     # link the message that ws edited
     message = models.ForeignKey(Message, related_name='history', on_delete=models.CASCADE)
