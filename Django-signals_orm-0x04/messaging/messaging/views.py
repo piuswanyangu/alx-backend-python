@@ -4,7 +4,7 @@ from django.contrib.auth import logout
 from django.contrib import messages
 
 @login_required
-def delete_user_view(request):
+def delete_user(request):
     """
     allows the current logged in user to delete their own account
     """
