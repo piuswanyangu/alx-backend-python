@@ -64,3 +64,21 @@ def sent_messages_view(request):
         'sent_messages': sent_messages
     }
     return render(request, 'messaging/sent_messages.html', context)
+
+def inbox_view(request):
+    # use the custom manager 'unread' and its custom methods
+    unread_messages_qs = Message.unread.unread_for_user(request.user)
+    # optimize the query with .only
+    # we only need the sender's username, content, and timestamp from the inbox
+    optimized_unread_messages = unread_messages_qs.only(
+        'sender_id',     """ required to access sender details via selected_related"""
+        'content',
+        'timestamp',
+        'id'            """ always good to include primary key"""
+    ).select_related('sender')
+
+    context = {
+        'unread_messages': optimized_unread_messages
+    }
+
+    return render(request, 'messaging/inbox.html', context)

@@ -1,6 +1,7 @@
+from typing import Self
 from django.db import models
 from django.contrib.auth import get_user_model
-
+from django.db.models import QuerySet
 from messaging_app.chats.models import User
 
 user = get_user_model()
@@ -16,6 +17,12 @@ class Message(models.Model):
 
     # track if the message has been edited
     edited = models.BooleanField(default=False)
+    read = models.BooleanField(default=False)
+    # redefine the default manager objects
+    objects = models.Manager()
+
+    # add our custom manager ' unread'
+    unread = UnreadMessagesManager() # type: ignore
 
     # self-referential ForeignKey
     # a message can optionally reply to another message
@@ -31,6 +38,7 @@ class Message(models.Model):
         ordering = ['timestamp']
         verbose_name = 'Message'
         verbose_name_plural = "Messages"
+    
 
     def get_recursive_replies(self):
         """ recursive fetches all descendants """
@@ -40,7 +48,8 @@ class Message(models.Model):
             return  all_replies
 
     def __str__(self):
-        return f"From {self.sender.username} to {self.receiver.username} at {self.timestamp.strftime('%Y-%m-%d %H:%M')} ({'Reply' if self.parent_message else 'Root'})"
+        status = 'Read' if self.read else 'unread'
+        return f"From {self.sender.username} to {self.receiver.username} at {self.timestamp.strftime('%Y-%m-%d %H:%M')} ({'Reply' if self.parent_message else 'Root'}) ({status})"
 
 class Notification(models.Model):
     # the user who is receiving the information
@@ -78,3 +87,20 @@ class MessageHistory(models.Model):
 
     def __str__(self):
         return f"History for Message {self.message.id} recorded at {self.edited_at.strftime('%Y-%m-%d %H:%M')}"
+    
+# unread messages
+class UnreadMessagesQuerySet(QuerySet):
+    """ custom queryset methods for unread messages. """
+    def by_user(self, user):
+        """ filters messages received by the user that are unread"""
+        return self.filter(receiver=user, read=False)
+class UnreadMessagesManager(models.Manager):
+    """ custom manager that uses the specialized queryset """
+   
+    def get_queryset(self):
+         # we ensure this manager always uses our custom queryset class
+        return UnreadMessagesQuerySet(self.model,using=self._db)
+    
+    def unread_for_user(self,user):
+        """ public method to fetch unread messages for a given user """
+        return self.get_queryset().by_user(user)
