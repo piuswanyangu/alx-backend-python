@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends "base.html" %} 
+{% block title %}Message History{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Message History</h1>
+
+        <div class="card mb-4 bg-light">
+            <div class="card-body">
+                <h4 class="card-title">Current Message</h4>
+                <p class="card-text">{{ message.content|linebreaksbr }}</p>
+                <small class="text-muted">
+                    Sent by: {{ message.sender.username }} on {{ message.timestamp|date:"M d, Y H:i" }}
+                    {% if message.edited %}
+                        <span class="badge bg-warning text-dark">Edited</span>
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+
+        <h2>Edit History</h2>
+
+        {% if history_records %}
+            <div class="list-group">
+                {% for record in history_records %}
+                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1 text-info">Version Edited: {{ forloop.counter }} Time(s) Ago</h5>
+                            <small class="text-muted">
+                                Recorded on: {{ record.edited_at|date:"M d, Y H:i" }}
+                            </small>
+                        </div>
+                        
+                        <p class="mb-1">
+                            **Previous Content:** {{ record.old_content|linebreaksbr }}
+                        </p>
+                        
+                        <small class="text-muted">
+                            Edited by: {{ record.edited_by.username }}
+                        </small>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-secondary">This message has not been edited yet, so there is no history.</p>
+        {% endif %}
+
+        <a href="{% url 'some_detail_view' message.pk %}" class="btn btn-secondary mt-3">Back to Message</a>
+    </div>
+{% endblock %}
+</body>
+</html>
