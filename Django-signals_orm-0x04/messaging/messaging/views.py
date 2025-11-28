@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
@@ -21,3 +21,14 @@ def delete_user_account_view(request):
         return redirect('home') 
     # for get request render a confirmation page
     return render(request, 'messaging/confirm_delete.html')
+
+# view for displaying history
+def message_history_view(request, pk):
+    from .models import Message # type: ignore
+    message = get_object_or_404(Message,pk=pk)
+    history_records = message.history.all()
+    context = {
+        'message': message,
+        'history_records': history_records,
+    }
+    return render(request, 'messaging/message_history.html', context)
