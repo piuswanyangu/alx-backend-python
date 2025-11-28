@@ -1,7 +1,7 @@
 from typing import Self
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.db.models import QuerySet
+from .managers import UnreadMessagesManager
 from messaging_app.chats.models import User
 
 user = get_user_model()
@@ -88,19 +88,3 @@ class MessageHistory(models.Model):
     def __str__(self):
         return f"History for Message {self.message.id} recorded at {self.edited_at.strftime('%Y-%m-%d %H:%M')}"
     
-# unread messages
-class UnreadMessagesQuerySet(QuerySet):
-    """ custom queryset methods for unread messages. """
-    def by_user(self, user):
-        """ filters messages received by the user that are unread"""
-        return self.filter(receiver=user, read=False)
-class UnreadMessagesManager(models.Manager):
-    """ custom manager that uses the specialized queryset """
-   
-    def get_queryset(self):
-         # we ensure this manager always uses our custom queryset class
-        return UnreadMessagesQuerySet(self.model,using=self._db)
-    
-    def unread_for_user(self,user):
-        """ public method to fetch unread messages for a given user """
-        return self.get_queryset().by_user(user)
