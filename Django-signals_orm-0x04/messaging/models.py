@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from messaging_app.chats.models import User
+
 user = get_user_model()
 
 class Message(models.Model):
@@ -15,13 +17,30 @@ class Message(models.Model):
     # track if the message has been edited
     edited = models.BooleanField(default=False)
 
+    # self-referential ForeignKey
+    # a message can optionally reply to another message
+    parent_message = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='replies'
+    )
+
     class Meta:
         ordering = ['timestamp']
         verbose_name = 'Message'
         verbose_name_plural = "Messages"
 
+    def get_recursive_replies(self):
+        """ recursive fetches all descendants """
+        all_replies = list(self.replies.all())
+        for reply in self.replies.all():
+            all_replies.extend(reply.get_recursive_replies())
+            return  all_replies
+
     def __str__(self):
-        return f"From {self.sender.username} to {self.receiver.username} at {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+        return f"From {self.sender.username} to {self.receiver.username} at {self.timestamp.strftime('%Y-%m-%d %H:%M')} ({'Reply' if self.parent_message else 'Root'})"
 
 class Notification(models.Model):
     # the user who is receiving the information
@@ -50,7 +69,7 @@ class MessageHistory(models.Model):
     old_content = models.TextField()
     # the user who made the edits
     edited_by = models.ForeignKey(User, related_name='edited_history', on_delete=models.SET_NULL, null=True)
-    # when edited happenned
+    # when edited happened
     edited_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
