@@ -52,12 +52,15 @@ class TestGetJson(unittest.TestCase):
 # parameterize and patch
 class TestMemoize(unittest.TestCase):
     """Test cases for memoize"""
+    
 
     def test_memoize(self):
         """Test that memoize caches the result of a_property"""
+
         class TestClass:
             def a_method(self):
                 return 42
+            
 
             @memoize
             def a_property(self):
