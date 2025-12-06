@@ -1,29 +1,34 @@
 #!/usr/bin/env python3
-
-"""unittest for client.githuborgclient"""
-
 import unittest
 from unittest.mock import patch
 from parameterized import parameterized
 
 from client import GithubOrgClient
 
-class TestGithunOrgClient(unittest.TestCase):
-    """test for ithuborgclient.org property"""
+
+class TestGithubOrgClient(unittest.TestCase):
+    """Test class for GithubOrgClient.org"""
+
     @parameterized.expand([
         ("google",),
         ("abc",),
     ])
-
-    @patch("client.get_json")
+    @patch('client.get_json')
     def test_org(self, org_name, mock_get_json):
-        """test that githuborgclient.org returns expected value"""
-        mock_payload = {"org": org_name}
-        mock_get_json.return_value = mock_payload
+        """Test that GithubOrgClient.org returns correct value"""
+        # Mocked payload returned by get_json
+        expected_payload = {"login": org_name}
+        mock_get_json.return_value = expected_payload
 
         client = GithubOrgClient(org_name)
-        result = client.org 
+        result = client.org
 
-        expected_url = f"https://api.github.com/orgs/{org_name}"
-        mock_get_json.assert_called_once_with(expected_url)
-        self.assertEqual(result, mock_payload)
+        # Assertions
+        self.assertEqual(result, expected_payload)
+        mock_get_json.assert_called_once_with(
+            f"https://api.github.com/orgs/{org_name}"
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()
