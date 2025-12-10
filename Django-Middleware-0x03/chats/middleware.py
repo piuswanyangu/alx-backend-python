@@ -99,23 +99,15 @@ class OffensiveLanguageMiddleware:
 # Blocks users who are NOT admin or moderator
 # ============================================================
 
-class RolePermissionMiddleware:
+class RolepermissionMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        """
-        Check if the user has admin privileges.
-        We assume the User model has a field: role = ('admin', 'moderator', 'user')
-        """
 
-        # Only check if the user is authenticated
         if request.user.is_authenticated:
-
-            # Get the role from the user model
             user_role = getattr(request.user, "role", None)
 
-            # Block if user is not admin or moderator
             if user_role not in ["admin", "moderator"]:
                 return JsonResponse(
                     {"error": "You do not have permission to perform this action."},
@@ -123,3 +115,4 @@ class RolePermissionMiddleware:
                 )
 
         return self.get_response(request)
+
