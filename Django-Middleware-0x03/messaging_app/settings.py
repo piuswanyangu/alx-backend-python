@@ -22,5 +22,6 @@ MIDDLEWARE = [
     # Custom middlewares
     'messaging_app.middleware.RequestLoggingMiddleware',
     'messaging_app.middleware.RestrictAccessByTimeMiddleware',
-    'chats.middleware.OffensiveLanguageMiddleware',  # 5 msgs/min limit
+    'chats.middleware.OffensiveLanguageMiddleware', 
+    'chats.middleware.RolePermissionMiddleware',
 ]
