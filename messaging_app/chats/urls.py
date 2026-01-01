@@ -9,5 +9,5 @@ urlpatterns = [
      path('users/', UserListView.as_view()),
      path('conversations/', ConversationListView.as_view()),
      path('messages/', MessageListView.as_view()),
-     path('api', include(router.urls))
+     # path('api', include(router.urls))
 ]
