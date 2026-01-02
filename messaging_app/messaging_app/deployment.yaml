@@ -1,0 +1,45 @@
+# 1. The Deployment: This defines how many copies (pods) of your app to run
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-messaging-app
+  labels:
+    app: django-app
+spec:
+  replicas: 2 # Kubernetes will ensure 2 copies of your app are always running
+  selector:
+    matchLabels:
+      app: django-app
+  template:
+    metadata:
+      labels:
+        app: django-app
+    spec:
+      containers:
+      - name: django-container
+        image: <your-docker-username>/django-messaging-app:latest # Replace with your actual image
+        ports:
+        - containerPort: 8000 # The port your Django app listens on inside the container
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+
+---
+
+# 2. The Service: This provides a stable internal IP address to reach the pods
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-service
+spec:
+  type: ClusterIP # Keeps the service internal to the cluster
+  selector:
+    app: django-app # This matches the label we gave the deployment above
+  ports:
+    - protocol: TCP
+      port: 80       # The port the service exposes internally
+      targetPort: 8000 # The port the container is listening on
