@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# 1. Apply the updated deployment
+echo "🚀 Triggering Rolling Update to Version 2.0..."
+kubectl apply -f blue_deployment.yaml
+
+# 2. Start a background loop to check for downtime
+echo "🌐 Monitoring for downtime (sending requests to http://localhost:8080)..."
+# We assume your port-forward or Ingress is running on 8080
+for i in {1..20}; do
+    response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 || echo "FAILED")
+    echo "Request $i: HTTP Status $response"
+    sleep 2
+done &
+
+# 3. Monitor the rollout status
+echo "📊 Rollout Progress:"
+kubectl rollout status deployment/django-blue
+
+# 4. Final verification
+echo "✅ Rolling Update Complete. Current Pods:"
+kubectl get pods -l version=blue

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-blue
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: django-app
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: django-app
+        version: blue
+    spec:
+      containers: # This was the missing level!
+      - name: django-container
+        image: nginx:1.25.3 # Using a valid image to get you running!
+        ports:
+        - containerPort: 80

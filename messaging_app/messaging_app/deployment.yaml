@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: django-container
-        image: <your-docker-username>/django-messaging-app:latest # Replace with your actual image
+        image: nginx:alpine # Replace with your actual image
         ports:
         - containerPort: 8000 # The port your Django app listens on inside the container
         resources:
