@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# 1. Scale the deployment to 3 replicas
+echo "Scaling Django deployment to 3 replicas..."
+kubectl scale deployment/django-messaging-app --replicas=3
+
+# 2. Wait a few seconds for pods to initialize and verify
+echo "Waiting for pods to reach 'Running' state..."
+sleep 5
+kubectl get pods
+
+# 3. Perform Load Testing
+# We use port-forwarding in the background to reach the internal ClusterIP service
+echo "Setting up temporary port-forward for load testing..."
+kubectl port-forward svc/django-service 8080:80 &
+PF_PID=$! # Save the process ID to kill it later
+sleep 3 # Give port-forward time to start
+
+echo "Starting load test with wrk (12 threads, 400 connections, 30 seconds)..."
+wrk -t12 -c400 -d30s http://localhost:8080/
+
+# 4. Monitor Resource Usage
+echo "Checking resource consumption (CPU/Memory)..."
+kubectl top pods
+
+# Clean up the port-forwarding process
+kill $PF_PID
+echo "Done."
