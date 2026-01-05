@@ -1,0 +1,36 @@
+pipeline {
+    agent any 
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git credentialsId: 'github-creds',
+                url: 'https://github.com/piuswanyangu/alx-backend-python.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                s '''
+                cd messaging_app
+                pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh '''
+                cd messaging_app
+                pytest --junitxml=report.xml
+                '''
+            }
+        }
+
+        stage('Publish Test Report') {
+            steps {
+                junit 'messaging_app/report.xml'
+            }
+        }
+    }
+}
