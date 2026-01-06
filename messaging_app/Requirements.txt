@@ -4,3 +4,4 @@ djangorestframework
 djangorestframework-simplejwt
 mysqlclient
 python-dotenv
+pip3-install
